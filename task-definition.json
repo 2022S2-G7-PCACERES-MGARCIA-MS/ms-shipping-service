@@ -64,7 +64,7 @@
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-east-1:798296330229:task-definition/shipping-service-example-taskdefinition:2",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:798296330229:task-definition/shipping-service-example-taskdefinition:3",
   "family": "shipping-service-example-taskdefinition",
   "requiresAttributes": [
     {
@@ -126,7 +126,7 @@
     "cpuArchitecture": null
   },
   "cpu": "256",
-  "revision": 2,
+  "revision": 3,
   "status": "ACTIVE",
   "inferenceAccelerators": null,
   "proxyConfiguration": null,
