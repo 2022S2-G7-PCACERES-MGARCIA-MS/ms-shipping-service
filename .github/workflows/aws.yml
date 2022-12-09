@@ -73,7 +73,7 @@ jobs:
         
     - name: Get task definition
       run: |
-        aws ecs describe-task-definition --task-definition dev-ms-shipping-service-td --output json --query taskDefinition > task-definition.json
+        aws ecs describe-task-definition --task-definition dev-${{ env.CONTAINER_NAME}}-td --output json --query taskDefinition > task-definition.json
                 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
