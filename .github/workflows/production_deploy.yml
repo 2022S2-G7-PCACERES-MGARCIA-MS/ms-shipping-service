@@ -1,20 +1,20 @@
-name: Deploy to Amazon ECS
+name: Deploy to Amazon ECS - Production
 
 on:   
   push:
-    branches: [ "main, stage, develop" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main, stage, develop" ]
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
   
 env:
   AWS_REGION: us-east-1                                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: dev-repository                         # set this to your Amazon ECR repository name
-  ECS_SERVICE: dev-shipping-service                       # set this to your Amazon ECS service name
-  ECS_CLUSTER: dev-cluster                                # set this to your Amazon ECS cluster name
-  CONTAINER_NAME: ms-shipping-service                 # set this to the name of the container in the containerDefinitions section of your task definition
+  ECR_REPOSITORY: prd-shipping-service                    # set this to your Amazon ECR repository name
+  ECS_SERVICE: prd-shipping-service                       # set this to your Amazon ECS service name
+  ECS_CLUSTER: prd-cluster                                # set this to your Amazon ECS cluster name
+  CONTAINER_NAME: ms-shipping-service                     # set this to the name of the container in the containerDefinitions section of your task definition
   
   
 permissions:
@@ -24,7 +24,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: develop
+    environment: production
 
     steps:    
     - name: Checkout
