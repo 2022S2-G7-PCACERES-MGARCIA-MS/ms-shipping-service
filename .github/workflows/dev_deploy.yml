@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECS - Development Environment
+name: CI/CD - Development
 
 on:   
   push:
@@ -10,21 +10,60 @@ on:
   workflow_dispatch:
   
 env:
-  AWS_REGION: us-east-1                                 # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: dev-repository-shipping-service       # set this to your Amazon ECR repository name
-  ECS_SERVICE: dev-shipping-service                     # set this to your Amazon ECS service name
-  ECS_CLUSTER: dev-cluster                              # set this to your Amazon ECS cluster name
-  CONTAINER_NAME: ms-shipping-service                   # set this to the name of the container in the containerDefinitions section of your task definition
+
+  AWS_REGION: us-east-1                                  # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: dev-repository-shipping-service        # set this to your Amazon ECR repository name
+  ECS_SERVICE: dev-shipping-service                      # set this to your Amazon ECS service name
+  ECS_CLUSTER: dev-cluster                               # set this to your Amazon ECS cluster name
+  CONTAINER_NAME: ms-shipping-service                    # set this to the name of the container in the containerDefinitions section of your task definition
+  SONAR_PROJECTKEY: 2022S2-G7-PCACERES-MGARCIA-MS_ms-shipping-service
+  ENVIRONMENT_NAME: development
+  IMAGE_TAG: latest
+
 
 permissions:
   contents: read
 
-jobs:    
+jobs:
+#  build:
+#    name: Build and Analyze Code
+#    runs-on: ubuntu-latest
+#    environment: develop
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis#
+
+#      - name: Set up JDK 11
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 11
+#
+#      - name: Cache SonarCloud packages
+#        uses: actions/cache@v1
+#        with:
+#          path: ~/.sonar/cache
+#          key: ${{ runner.os }}-sonar
+#          restore-keys: ${{ runner.os }}-sonar
+
+#      - name: Cache Maven packages
+#        uses: actions/cache@v1
+#        with:
+#          path: ~/.m2
+#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2
+
+#      - name: Build and analyze
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ env.SONAR_PROJECTKEY }}
   deploy:
-    name: Deploy
+    name: Build and Deploy Image
     runs-on: ubuntu-latest
     environment: develop
-
+#    needs: build
+#    if: github.event_name == 'push'
     steps:    
     - name: Checkout
       uses: actions/checkout@v3
@@ -48,8 +87,6 @@ jobs:
     - name: Retag image
       id: retag-img 
       uses: abronin/ecr-retag-action@v1
-      env:
-        IMAGE_TAG: ${{env.CONTAINER_NAME}}-latest
       with:
           repository: ${{ env.ECR_REPOSITORY }}
           tag: ${{ env.IMAGE_TAG }}
@@ -60,18 +97,16 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         # IMAGE_TAG: ${{ github.sha }}
-        IMAGE_TAG: ${{env.CONTAINER_NAME}}-latest
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --target development .
+        # Build a docker container and push it to ECR so that it can be deployed to ECS.
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --target ${{ env.ENVIRONMENT_NAME }} .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
         
     - name: Get task definition
       run: |
-        aws ecs describe-task-definition --task-definition dev-${{ env.CONTAINER_NAME}}-td --output json --query taskDefinition > task-definition.json
+        aws ecs describe-task-definition --task-definition dev-${{ env.CONTAINER_NAME }}-td --output json --query taskDefinition > task-definition.json
                 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
