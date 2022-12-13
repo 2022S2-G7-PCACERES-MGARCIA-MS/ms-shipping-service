@@ -87,8 +87,6 @@ jobs:
     - name: Retag image
       id: retag-img 
       uses: abronin/ecr-retag-action@v1
-  #    env:
-  #      IMAGE_TAG: ${{env.CONTAINER_NAME}}-latest
       with:
           repository: ${{ env.ECR_REPOSITORY }}
           tag: ${{ env.IMAGE_TAG }}
