@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
   
 env:
+
   AWS_REGION: us-east-1                                  # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: dev-repository-shipping-service        # set this to your Amazon ECR repository name
   ECS_SERVICE: dev-shipping-service                      # set this to your Amazon ECS service name
@@ -18,6 +19,7 @@ env:
   SONAR_PROJECTKEY: 2022S2-G7-PCACERES-MGARCIA-MS_ms-shipping-service
   ENVIRONMENT_NAME: development
   IMAGE_TAG: latest
+
 
 permissions:
   contents: read
