@@ -8,6 +8,7 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    branches: [ "main" ]
   
 env:
   AWS_REGION: us-east-1                                 # set this to your preferred AWS region, e.g. us-west-1
@@ -20,7 +21,9 @@ env:
   IMAGE_TAG: latest                                     # set the tag to the new image
   
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
+
 
 jobs:
   build:
