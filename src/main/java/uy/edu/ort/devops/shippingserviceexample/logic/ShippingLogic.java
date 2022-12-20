@@ -23,6 +23,14 @@ public class ShippingLogic {
 
     public void addShipping(String id) {
         logger.info("Adding shipping: " + id);
+
+        int code = id.hashCode() % 10;
+
+        switch (code) {
+            case 0: case 1: case 2: testShipping.put(id, new Shipping("Delivered", id)); break;
+            case 3: case 4: case 5: case 6: testShipping.put(id, new Shipping("In transit", id)); break;
+            case 7: case 8: case 9: testShipping.put(id, new Shipping("Preparing", id)); break;
+        }  
     }
 
     public boolean hasShipping(String id) {
